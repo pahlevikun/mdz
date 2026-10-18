@@ -78,10 +78,12 @@ const HELP = `mdz — any web page to LLM-ready Markdown
   --chunk <n>          token budget per chunk (default 8000)
   --split <dir>        one .md per chunk + index.json
   --no-map             omit the page map
+  --map                force the page map on
   --no-links           strip links
   --images             keep image tags
   --model <p>          o200k | cl100k | approx
   --selector <css>     extract only this element
+  --crawl <depth>      follow same-site links up to depth, writes one JSON per page
   --quiet              no progress lines`;
 
 if (import.meta.main) {
