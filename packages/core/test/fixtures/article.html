@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Token Counting for Modern Web Articles</title>
+  <meta name="description" content="How we measure article length for language models.">
+  <meta name="author" content="Jane Writer">
+</head>
+<body>
+  <nav class="site-nav"><a href="/login">Sign in</a></nav>
+  <div class="ad-slot" data-ad="true">Sponsored: Buy tokens now</div>
+  <article>
+    <h1>Measuring Articles for Language Models</h1>
+    <p>Converting web pages to clean markdown helps teams feed consistent context into retrieval systems and chat prompts. A good extractor removes chrome, keeps headings, and preserves tables and code samples that carry real information. This article walks through why naive character division fails for multilingual text and how real tokenizers behave on mixed content. Readers should leave with a practical sense of when to trust counts and when to re-measure after editing.</p>
+    <h2>Why naive estimates fail</h2>
+    <p>Many tools approximate tokens as one quarter of the character length. That shortcut is fast but wrong for CJK paragraphs, emoji-heavy UI copy, and source code where punctuation clusters. Real encoders split text into vocabulary entries that do not align with words or bytes. For budgeting chunk sizes, underestimating can overflow model windows; overestimating can waste context. Teams shipping multilingual docs should always measure with the same profile they use in production routing.</p>
+    <p>Tables and fenced code blocks are especially sensitive. Pipe tables compress structure into fewer visible characters than the tokens they consume. Code fences add delimiter lines that tokenizers treat distinctly from prose. The fixture below includes a minimal model table and a short TypeScript sample so downstream tests can assert GFM survival through turndown.</p>
+    <table><thead><tr><th>Model</th><th>Tokens</th></tr></thead>
+    <tbody><tr><td>o200k</td><td>200000</td></tr></tbody></table>
+    <pre><code class="language-ts">export function greet(name: string): string {
+  return \`Hello, \${name}\`;
+}
+</code></pre>
+    <p>When you publish, re-run counts after edits. Small wording changes can shift token totals enough to affect chunk boundaries. Treat tokenizer output as the source of truth rather than rules of thumb copied from English-only blogs.</p>
+  </article>
+</body>
+</html>
