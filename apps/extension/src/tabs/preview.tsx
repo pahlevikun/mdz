@@ -8,12 +8,21 @@ import { copyForFigma } from "../figma-copy";
 import { withLayoutFrame } from "../figma-frame";
 import { snapshotForFigma } from "../figma-snapshot";
 import type { Doc } from "../../../../packages/core/src/types";
+import {
+  detectStack,
+  renderStackJson,
+  type PageSignals,
+  type StackReport,
+  type TechCategory,
+} from "../../../../packages/core/src/tech-stack";
+import { gatherPageSignals } from "../stack-signals";
 
 interface Payload {
   html: string;
   url: string;
   selection: string;
   viewportWidth?: number;
+  pageSignals?: PageSignals;
 }
 
 interface SyncSettings {
@@ -209,6 +218,77 @@ const css = `
     cursor: pointer;
   }
   .shot-panel button:hover { filter: brightness(1.08); }
+  .stack-wrap {
+    flex-shrink: 0;
+    border-bottom: 1px solid #252830;
+    background: #14161a;
+  }
+  .stack-wrap details { padding: 0; }
+  .stack-wrap summary {
+    cursor: pointer;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .stack-wrap summary::-webkit-details-marker { display: none; }
+  .stack-body { padding: 0 16px 12px; }
+  .stack-cat {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #9aa0a6;
+    margin: 10px 0 6px;
+  }
+  .stack-item { margin-bottom: 10px; }
+  .stack-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .conf-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .conf-high { background: #3fb950; }
+  .conf-medium { background: #d29922; }
+  .conf-low { background: #6e7681; }
+  .stack-evidence {
+    margin: 4px 0 0 16px;
+    padding: 0;
+    font-size: 11px;
+    color: #9aa0a6;
+    line-height: 1.45;
+  }
+  .stack-evidence li { margin: 2px 0; }
+  .stack-limits {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid #252830;
+    font-size: 11px;
+    color: #7d848d;
+    line-height: 1.45;
+  }
+  .stack-limits p { margin: 4px 0; }
+  .stack-actions { margin-bottom: 8px; }
+  .stack-actions button {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid #3a3f47;
+    background: #1e2128;
+    color: #e6e8eb;
+    cursor: pointer;
+  }
+  .stack-actions button:hover { background: #252a33; }
   @media (prefers-color-scheme: light) {
     body { background: #f6f7f9; color: #1a1d21; }
     .bar { background: #fff; border-bottom-color: #e2e4e8; }
@@ -227,8 +307,94 @@ const css = `
     .empty h1 { color: #1a1d21; }
     .empty kbd { background: #eef0f3; border-color: #dadce0; color: #1a1d21; }
     .shot-panel { background: #fff; border-bottom-color: #e2e4e8; }
+    .stack-wrap { background: #fff; border-bottom-color: #e2e4e8; }
+    .stack-limits { border-top-color: #e2e4e8; color: #5f6368; }
+    .stack-actions button { background: #fff; border-color: #dadce0; color: #1a1d21; }
   }
 `;
+
+const CATEGORY_ORDER: TechCategory[] = [
+  "framework",
+  "ui",
+  "ssr",
+  "cms",
+  "ecommerce",
+  "analytics",
+  "cdn",
+  "hosting",
+  "fonts",
+  "payments",
+  "support",
+  "monitoring",
+  "tag-manager",
+  "build",
+  "language",
+];
+
+function confidenceClass(c: "high" | "medium" | "low"): string {
+  if (c === "high") return "conf-dot conf-high";
+  if (c === "medium") return "conf-dot conf-medium";
+  return "conf-dot conf-low";
+}
+
+function StackPanel({
+  report,
+  onCopyJson,
+  copied,
+}: {
+  report: StackReport;
+  onCopyJson: () => void;
+  copied: boolean;
+}) {
+  const byCategory = new Map<TechCategory, typeof report.findings>();
+  for (const f of report.findings) {
+    const list = byCategory.get(f.category) ?? [];
+    list.push(f);
+    byCategory.set(f.category, list);
+  }
+  return (
+    <div className="stack-wrap">
+      <details>
+        <summary>Stack ({report.findings.length} findings)</summary>
+        <div className="stack-body">
+          <div className="stack-actions">
+            <button type="button" onClick={onCopyJson}>
+              {copied ? "Copied" : "Copy stack JSON"}
+            </button>
+          </div>
+          {CATEGORY_ORDER.map((cat) => {
+            const items = byCategory.get(cat);
+            if (!items?.length) return null;
+            return (
+              <div key={cat}>
+                <div className="stack-cat">{cat}</div>
+                {items.map((f) => (
+                  <div key={f.name} className="stack-item">
+                    <div className="stack-name">
+                      <span className={confidenceClass(f.confidence)} aria-hidden />
+                      <span>{f.name}</span>
+                      <span className="badge">{f.confidence}</span>
+                    </div>
+                    <ul className="stack-evidence">
+                      {f.evidence.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+          <div className="stack-limits">
+            {report.limitations.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+        </div>
+      </details>
+    </div>
+  );
+}
 
 function PreviewTab() {
   const [doc, setDoc] = useState<Doc | null>(null);
@@ -284,6 +450,17 @@ function PreviewTab() {
 
   const tokens = useMemo(() => countTokensBoth(activeMd), [activeMd]);
   const html = useMemo(() => renderMarkdownHtml(activeMd), [activeMd]);
+  const stackReport = useMemo((): StackReport | null => {
+    if (!payload) return null;
+    const signals =
+      payload.pageSignals ??
+      gatherPageSignals(
+        new DOMParser().parseFromString(payload.html, "text/html"),
+        payload.url,
+      );
+    return detectStack(signals);
+  }, [payload]);
+
   const banner = useMemo(
     () =>
       /enable.{0,12}javascript/i.test(activeMd) ||
@@ -410,6 +587,11 @@ function PreviewTab() {
       </div>
     ) : null;
 
+  const onCopyStackJson = () => {
+    if (!stackReport) return;
+    void flashCopy("stack-json", renderStackJson(stackReport));
+  };
+
   const onDownload = () => {
     const name = slug(doc?.title || "page") + ".md";
     const blob = new Blob([exportMd], { type: "text/markdown;charset=utf-8" });
@@ -461,6 +643,13 @@ function PreviewTab() {
       <style>{css}</style>
       <div className="root">
         {shotPanel}
+        {stackReport ? (
+          <StackPanel
+            report={stackReport}
+            onCopyJson={onCopyStackJson}
+            copied={copied === "stack-json"}
+          />
+        ) : null}
         <header className="bar">
           <span className="bar-title">{doc.title || "Untitled"}</span>
           <span className="bar-domain">{doc.domain}</span>

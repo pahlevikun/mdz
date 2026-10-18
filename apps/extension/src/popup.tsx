@@ -153,15 +153,9 @@ function IndexPopup() {
   const grabPage = useCallback(async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
     if (tab?.id !== undefined) {
-      const p = await chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        func: () => ({
-          html: document.documentElement.outerHTML,
-          url: location.href,
-          selection: window.getSelection()?.toString() ?? "",
-        }),
-      })
-      await chrome.storage.session.set({ mdzPayload: p[0]?.result })
+      const { grab } = await import("./background")
+      const payload = await grab(tab.id)
+      await chrome.storage.session.set({ mdzPayload: payload })
       await chrome.tabs.create({ url: chrome.runtime.getURL("tabs/preview.html") })
       window.close()
     }

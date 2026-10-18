@@ -1,6 +1,8 @@
 import { planShot, stitchFrames } from "./screenshot";
 import { applyTheme, clearTheme, initThemeController } from "./theme-controller";
 import { parseTheme } from "./theme";
+import { collectSignals } from "./stack-signals";
+import type { PageSignals } from "../../../packages/core/src/tech-stack";
 
 initThemeController();
 
@@ -8,6 +10,7 @@ export interface Payload {
   html: string;
   url: string;
   selection: string;
+  pageSignals?: PageSignals;
 }
 
 interface MeasureResult {
@@ -121,7 +124,19 @@ export async function grab(tabId: number): Promise<Payload | null> {
       selection: window.getSelection()?.toString() ?? "",
     }),
   });
-  return (res?.result as Payload | undefined) ?? null;
+  const base = res?.result as Omit<Payload, "pageSignals"> | undefined;
+  if (!base) return null;
+  let pageSignals: PageSignals | undefined;
+  try {
+    const [sigRes] = await chrome.scripting.executeScript({
+      target: { tabId },
+      func: collectSignals,
+    });
+    pageSignals = sigRes?.result as PageSignals | undefined;
+  } catch {
+    pageSignals = undefined;
+  }
+  return { ...base, pageSignals };
 }
 
 export async function open(payload: Payload): Promise<void> {

@@ -24,6 +24,8 @@ export { buildSiteTree, renderSiteTree } from "./site-tree";
 export type { TreePage, TreeEdge, SiteTree, BuildSiteTreeOptions } from "./site-tree";
 export { classifyPage, buildTaxonomy, applyOverrides } from "./taxonomy";
 export type { TaxonomyGuess, Taxonomy } from "./taxonomy";
+export { detectStack, renderStackJson } from "./tech-stack";
+export type { PageSignals, Finding, TechCategory, StackReport } from "./tech-stack";
 
 const IMG = /!\[[^\]]*\]\([^)]*\)/g;
 const LINK = /(?<!!)\[([^\]]*)\]\([^)]*\)/g;
