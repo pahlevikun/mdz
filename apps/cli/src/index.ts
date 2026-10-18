@@ -32,8 +32,20 @@ export async function run(argv: string[], deps: Deps): Promise<number> {
     const docs = await crawl(o.url, { depth: o.crawl, max: 20, chunk: o.chunk, http: deps.http });
     const dir = o.split || ".";
     deps.mkdir(dir);
+    const seen = new Map<string, number>();
     docs.forEach((d, i) => {
-      const name = `${String(i + 1).padStart(2, "0")}-${(d.domain || "page").replace(/\W+/g, "-")}.json`;
+      // name from the page's own path, not the host: "01-http-methods.json"
+      const slug = (() => {
+        try {
+          const p = new URL(d.finalUrl).pathname.replace(/\/+$/, "");
+          const last = p.split("/").filter(Boolean).pop() ?? "";
+          return last.replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase();
+        } catch { return ""; }
+      })();
+      const base = slug || "index";
+      const n = (seen.get(base) ?? 0) + 1;
+      seen.set(base, n);
+      const name = `${String(i + 1).padStart(2, "0")}-${base}${n > 1 ? `-${n}` : ""}.json`;
       deps.writeFile(join(dir, name), renderJson(d));
     });
     if (!o.quiet) deps.stdout(`crawled ${docs.length} pages into ${dir}\n`);
