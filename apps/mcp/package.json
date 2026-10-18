@@ -1,0 +1,1 @@
+{"name":"mdz-mcp","private":true,"type":"module","dependencies":{"@modelcontextprotocol/sdk":"1.32.1","zod":"4.6.7","mdz-core":"workspace:*"},"devDependencies":{"bun-types":"latest"}}
