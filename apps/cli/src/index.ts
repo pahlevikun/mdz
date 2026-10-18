@@ -23,6 +23,10 @@ export async function run(argv: string[], deps: Deps): Promise<number> {
     deps.stdout(HELP + "\n");
     return 0;
   }
+  if (o.url === "--version") {
+    deps.stdout(VERSION + "\n");
+    return 0;
+  }
 
   if (o.crawl > 0) {
     const docs = await crawl(o.url, { depth: o.crawl, max: 20, chunk: o.chunk, http: deps.http });
@@ -68,6 +72,8 @@ export async function run(argv: string[], deps: Deps): Promise<number> {
   return 0;
 }
 
+const VERSION = "0.1.0";
+
 const HELP = `mdz — any web page to LLM-ready Markdown
 
   mdz <url> [options]
@@ -84,6 +90,7 @@ const HELP = `mdz — any web page to LLM-ready Markdown
   --model <p>          o200k | cl100k | approx
   --selector <css>     extract only this element
   --crawl <depth>      follow same-site links up to depth, writes one JSON per page
+  --version            print the version
   --quiet              no progress lines`;
 
 if (import.meta.main) {

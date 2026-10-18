@@ -34,6 +34,7 @@ export function parseArgs(argv: string[]): CliOptions {
       case "--crawl": o.crawl = Number(next()); break;
       case "--quiet": o.quiet = true; break;
       case "-h": case "--help": positional.push("--help"); break;
+      case "-v": case "--version": positional.push("--version"); break;
       default:
         if (a.startsWith("-")) throw new Error(`unknown flag: ${a}`);
         positional.push(a);
