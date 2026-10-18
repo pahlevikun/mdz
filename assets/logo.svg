@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 904 256" width="904" height="256" fill="none" role="img" aria-label="mdz - any page to LLM-ready markdown">
+  <!-- canvas: #0f1115, panel: #14161a, surface: #1e2128, surface-raised: #252830, border: #3a3f47, border-strong: #252a33, text: #e6e8eb, text-body: #d7dbe0, text-muted: #9aa0a6, primary: #2f6feb -->
+  <rect x="2" y="2" width="900" height="252" rx="18" fill="#0f1115" stroke="#3a3f47" stroke-width="2"/>
+
+  <g transform="translate(28 60)">
+    <rect x="1" y="1" width="134" height="134" rx="27" fill="#14161a" stroke="#3a3f47" stroke-width="2"/>
+    <path d="M 38 20 H 96 L 112 36 V 100 A 6 6 0 0 1 106 106 H 38 A 6 6 0 0 1 32 100 V 26 A 6 6 0 0 1 38 20 Z" fill="#1e2128" stroke="#3a3f47" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 96 20 V 32 A 6 6 0 0 0 102 36 H 112 Z" fill="#252830" stroke="#3a3f47" stroke-width="1.5" stroke-linejoin="round"/>
+    <rect x="42" y="46" width="70" height="5" rx="2.5" fill="#9aa0a6"/>
+    <rect x="42" y="56" width="56" height="5" rx="2.5" fill="#9aa0a6"/>
+    <g>
+      <rect x="42" y="68" width="4" height="14" rx="1.5" fill="#2f6feb"/>
+      <rect x="54" y="68" width="4" height="14" rx="1.5" fill="#2f6feb"/>
+      <rect x="40" y="72" width="20" height="3" rx="1.5" fill="#2f6feb"/>
+      <rect x="40" y="79" width="20" height="3" rx="1.5" fill="#2f6feb"/>
+    </g>
+    <rect x="42" y="90" width="12" height="4" rx="2" fill="#2f6feb"/>
+    <rect x="58" y="88" width="48" height="5" rx="2.5" fill="#9aa0a6"/>
+  </g>
+
+  <text x="184" y="132" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="76" font-weight="700" letter-spacing="-0.02em" fill="#e6e8eb">mdz</text>
+
+  <text x="184" y="182" font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="22" font-weight="400" fill="#9aa0a6">any page to LLM-ready markdown</text>
+
+  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="16" font-weight="500">
+    <rect x="184" y="196" width="52" height="28" rx="999" fill="#252830" stroke="#3a3f47" stroke-width="1"/>
+    <text x="210" y="215" text-anchor="middle" fill="#d7dbe0">CLI</text>
+    <rect x="244" y="196" width="58" height="28" rx="999" fill="#252830" stroke="#3a3f47" stroke-width="1"/>
+    <text x="273" y="215" text-anchor="middle" fill="#d7dbe0">MCP</text>
+    <rect x="310" y="196" width="104" height="28" rx="999" fill="#252830" stroke="#3a3f47" stroke-width="1"/>
+    <text x="362" y="215" text-anchor="middle" fill="#d7dbe0">EXTENSION</text>
+  </g>
+
+  <!-- Right column: a real terminal line, mono, no invented output -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace">
+    <rect x="580" y="88" width="286" height="76" rx="6" fill="#1e2128" stroke="#252a33" stroke-width="1"/>
+    <text x="600" y="118" font-size="17" fill="#9aa0a6">$</text>
+    <text x="620" y="118" font-size="17" fill="#d7dbe0">mdz https://x.co/a</text>
+    <text x="600" y="144" font-size="14" fill="#3fb950">1284 tokens</text>
+    <text x="700" y="144" font-size="14" fill="#9aa0a6">· 6 chunks · .md</text>
+  </g>
+
+  <line x1="556" y1="96" x2="556" y2="172" stroke="#252a33" stroke-width="1"/>
+</svg>
