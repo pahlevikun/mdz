@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { extractUrl, renderJson, renderMarkdown } from "mdz-core";
 import { fetchHtml } from "../../../packages/core/src/fetch";
 import { parseArgs } from "./args";
+import { crawl } from "./crawl";
 
 export interface Deps {
   http: (u: string) => Promise<{ html: string; finalUrl: string }>;
@@ -20,6 +21,18 @@ export async function run(argv: string[], deps: Deps): Promise<number> {
   }
   if (o.url === "--help") {
     deps.stdout(HELP + "\n");
+    return 0;
+  }
+
+  if (o.crawl > 0) {
+    const docs = await crawl(o.url, { depth: o.crawl, max: 20, chunk: o.chunk, http: deps.http });
+    const dir = o.split || ".";
+    deps.mkdir(dir);
+    docs.forEach((d, i) => {
+      const name = `${String(i + 1).padStart(2, "0")}-${(d.domain || "page").replace(/\W+/g, "-")}.json`;
+      deps.writeFile(join(dir, name), renderJson(d));
+    });
+    if (!o.quiet) deps.stdout(`crawled ${docs.length} pages into ${dir}\n`);
     return 0;
   }
 
