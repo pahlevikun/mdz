@@ -4,12 +4,16 @@ import { countTokensBoth } from "../../../../packages/core/src/tokens";
 import { toFrontmatter } from "../../../../packages/core/src/frontmatter";
 import { renderMarkdown } from "../../../../packages/core/src/render";
 import { renderMarkdownHtml } from "../md-render";
+import { copyForFigma } from "../figma-copy";
+import { withLayoutFrame } from "../figma-frame";
+import { snapshotForFigma } from "../figma-snapshot";
 import type { Doc } from "../../../../packages/core/src/types";
 
 interface Payload {
   html: string;
   url: string;
   selection: string;
+  viewportWidth?: number;
 }
 
 interface SyncSettings {
@@ -99,6 +103,22 @@ const css = `
     background: #3d2a14;
     color: #f0c674;
     border-bottom: 1px solid #5c4220;
+  }
+  .figma-note {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    font-size: 12px;
+    background: #1e2a3d;
+    color: #9ec5ff;
+    border-bottom: 1px solid #2a3f5c;
+  }
+  .figma-err {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    font-size: 12px;
+    background: #3d1e1e;
+    color: #f48771;
+    border-bottom: 1px solid #5c2a2a;
   }
   .cols {
     flex: 1;
@@ -198,6 +218,8 @@ const css = `
     .bar button { background: #fff; border-color: #dadce0; color: #1a1d21; }
     .bar button:hover { background: #f1f3f4; }
     .banner { background: #fef7e0; color: #7a5c00; border-bottom-color: #f9e8b8; }
+    .figma-note { background: #e8f0fe; color: #174ea6; border-bottom-color: #c6dafc; }
+    .figma-err { background: #fce8e6; color: #c5221f; border-bottom-color: #f5c6c2; }
     .cols textarea { background: #fff; color: #1a1d21; }
     .preview { border-left-color: #e2e4e8; }
     .preview a { color: #1a73e8; }
@@ -216,6 +238,10 @@ function PreviewTab() {
   const [copied, setCopied] = useState("");
   const [error, setError] = useState("");
   const [mdzShot, setMdzShot] = useState<string | null>(null);
+  const [figmaPreparing, setFigmaPreparing] = useState(false);
+  const [figmaNote, setFigmaNote] = useState("");
+  const [figmaError, setFigmaError] = useState("");
+  const [payload, setPayload] = useState<Payload | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -233,6 +259,7 @@ function PreviewTab() {
           setError("");
           return;
         }
+        setPayload(p);
         const dom = new DOMParser().parseFromString(p.html, "text/html");
         const useSel =
           (sync.selectionOnly ?? true) && p.selection.trim().length > 0;
@@ -290,6 +317,58 @@ function PreviewTab() {
       "\n\n" +
       activeMd;
     void flashCopy("prompt", prompt);
+  };
+
+  const figmaToDataUrl = (url: string): string | null => {
+    if (url.startsWith("data:")) return url;
+    try {
+      const u = new URL(url, window.location.href);
+      if (u.origin !== window.location.origin) return null;
+    } catch {
+      return null;
+    }
+    return null;
+  };
+
+  const onCopyFigma = async () => {
+    if (!payload || figmaPreparing) return;
+    const width = payload.viewportWidth ?? 1280;
+    setFigmaPreparing(true);
+    setFigmaError("");
+    setFigmaNote("");
+    try {
+      let truncatedReason = "";
+      const figmaHtml = await withLayoutFrame(
+        payload.html,
+        payload.url,
+        { width },
+        (root) => {
+          const snap = snapshotForFigma(root, undefined, {
+            toDataUrl: figmaToDataUrl,
+          });
+          if (snap.truncated && snap.reason) {
+            truncatedReason = snap.reason;
+          }
+          return snap.html;
+        },
+      );
+      await copyForFigma({
+        figmaHtml,
+        markdown: exportMd,
+        pngDataUrl: mdzShot ?? undefined,
+      });
+      setCopied("figma");
+      window.setTimeout(() => setCopied(""), 1200);
+      let note = `Snapshot taken from the captured page at ${width}px.`;
+      if (truncatedReason) {
+        note += ` Copied a simplified snapshot: ${truncatedReason}.`;
+      }
+      setFigmaNote(note);
+    } catch (e) {
+      setFigmaError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setFigmaPreparing(false);
+    }
   };
 
   const onCopyFrontmatter = () => {
@@ -414,7 +493,20 @@ function PreviewTab() {
           {btn("prompt", "Copy as prompt", onCopyPrompt)}
           {btn("download", "Download .md", onDownload)}
           {btn("frontmatter", "Copy frontmatter", onCopyFrontmatter)}
+          <button
+            type="button"
+            disabled={figmaPreparing}
+            onClick={() => void onCopyFigma()}
+          >
+            {figmaPreparing
+              ? "Preparing…"
+              : copied === "figma"
+                ? "Copied"
+                : "Copy for Figma"}
+          </button>
         </header>
+        {figmaNote ? <div className="figma-note">{figmaNote}</div> : null}
+        {figmaError ? <div className="figma-err">{figmaError}</div> : null}
         {banner ? (
           <div className="banner">
             This page may need JavaScript to render fully, or extraction found
@@ -428,7 +520,10 @@ function PreviewTab() {
             aria-label="Markdown"
             spellCheck={false}
           />
-          <div className="preview" dangerouslySetInnerHTML={{ __html: html }} />
+          <div
+            className="preview"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
         </div>
       </div>
     </>
