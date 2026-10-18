@@ -1,0 +1,64 @@
+name: release
+on:
+  push:
+    tags:
+      - v*
+jobs:
+  binaries:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        include:
+          - target: bun-linux-x64
+            artifact: mdz-linux-x64
+          - target: bun-darwin-arm64
+            artifact: mdz-darwin-arm64
+          - target: bun-darwin-x64
+            artifact: mdz-darwin-x64
+          - target: bun-windows-x64
+            artifact: mdz-windows-x64.exe
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - run: bun build apps/cli/src/index.ts --compile --target=${{ matrix.target }} --outfile dist/${{ matrix.artifact }}
+      - run: bun build apps/mcp/src/server.ts --compile --target=${{ matrix.target }} --outfile dist/${{ matrix.artifact }}-mcp
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/${{ matrix.artifact }}*
+  extension:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.3
+      - run: bun install --frozen-lockfile
+      - run: cd apps/extension && bun run build --target=chrome-mv3
+      - run: cd apps/extension && bun run build --target=firefox-mv3
+      - run: cd apps/extension/build/chrome-mv3-prod && zip -r ../../mdz-chrome-mv3.zip .
+      - run: cd apps/extension/build/firefox-mv3-prod && zip -r ../../mdz-firefox-mv3.zip .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extension-zips
+          path: apps/extension/mdz-*.zip
+  publish:
+    needs: [binaries, extension]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**
