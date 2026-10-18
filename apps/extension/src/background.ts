@@ -1,4 +1,8 @@
 import { planShot, stitchFrames } from "./screenshot";
+import { applyTheme, clearTheme, initThemeController } from "./theme-controller";
+import { parseTheme } from "./theme";
+
+initThemeController();
 
 export interface Payload {
   html: string;
@@ -181,6 +185,39 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           error: err instanceof Error ? err.message : String(err),
         }),
       );
+    return true;
+  }
+  if (message?.type === "mdz:theme") {
+    const tabId = message.tabId as number | undefined;
+    if (tabId === undefined) {
+      sendResponse({
+        engine: "none",
+        applied: false,
+        note: "No tab",
+      });
+      return true;
+    }
+    const mode = parseTheme(message.mode);
+    void applyTheme(tabId, mode)
+      .then(sendResponse)
+      .catch((err: unknown) =>
+        sendResponse({
+          engine: "none",
+          applied: false,
+          note: err instanceof Error ? err.message : String(err),
+        }),
+      );
+    return true;
+  }
+  if (message?.type === "mdz:theme-clear") {
+    const tabId = message.tabId as number | undefined;
+    if (tabId !== undefined) {
+      void clearTheme(tabId)
+        .then(() => sendResponse({ ok: true }))
+        .catch(() => sendResponse({ ok: false }));
+    } else {
+      sendResponse({ ok: false });
+    }
     return true;
   }
   return undefined;

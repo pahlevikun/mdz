@@ -94,6 +94,11 @@ const DEFAULTS: Settings = {
 function OptionsPage() {
   const [settings, setSettings] = useState<Settings>(DEFAULTS)
   const [saved, setSaved] = useState(false)
+  const [preciseTheme, setPreciseTheme] = useState(false)
+
+  useEffect(() => {
+    void chrome.permissions.contains({ permissions: ["debugger"] }).then(setPreciseTheme)
+  }, [])
 
   useEffect(() => {
     void chrome.storage.sync.get(null).then((raw) => {
@@ -204,6 +209,31 @@ function OptionsPage() {
             Include YAML frontmatter by default
           </label>
         </div>
+        <div style={checkRow}>
+          <input
+            id="preciseTheme"
+            type="checkbox"
+            checked={preciseTheme}
+            onChange={(e) => {
+              const on = e.target.checked
+              if (on) {
+                void chrome.permissions
+                  .request({ permissions: ["debugger"] })
+                  .then((granted) => setPreciseTheme(granted))
+              } else {
+                void chrome.permissions
+                  .remove({ permissions: ["debugger"] })
+                  .then(() => setPreciseTheme(false))
+              }
+            }}
+          />
+          <label htmlFor="preciseTheme">Precise theme emulation</label>
+        </div>
+        <p style={helper}>
+          Uses the browser debugger to apply the site&apos;s real dark or light
+          theme; Chrome shows a &quot;Debugging this browser&quot; banner while it
+          is active.
+        </p>
         <button type="submit" style={primaryBtn}>
           {saved ? "Saved" : "Save"}
         </button>

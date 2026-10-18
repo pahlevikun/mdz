@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react"
+import type { ThemeMode } from "./theme"
 
 const card: React.CSSProperties = {
   width: 260,
@@ -66,8 +67,58 @@ const errorLine: React.CSSProperties = {
   lineHeight: 1.35,
 }
 
+const themeRow: React.CSSProperties = {
+  display: "flex",
+  gap: 4,
+  marginTop: 12,
+}
+
+const themeSeg: React.CSSProperties = {
+  flex: 1,
+  padding: "6px 0",
+  fontSize: 11,
+  fontWeight: 600,
+  fontFamily: "inherit",
+  color: "#9aa0a6",
+  background: "#1e2128",
+  border: "1px solid #3a3f47",
+  borderRadius: 6,
+  cursor: "pointer",
+}
+
+const themeSegActive: React.CSSProperties = {
+  ...themeSeg,
+  color: "#e6e8eb",
+  background: "#2f6feb",
+  borderColor: "#2f6feb",
+}
+
+const themeNote: React.CSSProperties = {
+  marginTop: 6,
+  fontSize: 11,
+  color: "#f0c674",
+  lineHeight: 1.35,
+}
+
+const approxBadge: React.CSSProperties = {
+  display: "inline-block",
+  marginTop: 6,
+  marginRight: 6,
+  fontSize: 10,
+  fontWeight: 600,
+  padding: "2px 6px",
+  borderRadius: 4,
+  background: "#3d2a14",
+  color: "#f0c674",
+}
+
+const THEME_OPTIONS: ThemeMode[] = ["auto", "dark", "light"]
+
 function IndexPopup() {
   const [screenshotError, setScreenshotError] = useState<string | null>(null)
+  const [themeMode, setThemeMode] = useState<ThemeMode>("auto")
+  const [themeNoteText, setThemeNoteText] = useState("")
+  const [themeEngine, setThemeEngine] = useState<"emulate" | "filter" | "none">("none")
 
   const fullPageScreenshot = useCallback(async () => {
     setScreenshotError(null)
@@ -80,6 +131,23 @@ function IndexPopup() {
     }
     await chrome.tabs.create({ url: chrome.runtime.getURL("tabs/preview.html") })
     window.close()
+  }, [])
+
+  const setTheme = useCallback(async (mode: ThemeMode) => {
+    setThemeMode(mode)
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    if (tab?.id === undefined) return
+    const res = await chrome.runtime.sendMessage({
+      type: "mdz:theme",
+      tabId: tab.id,
+      mode,
+    })
+    if (res && typeof res === "object") {
+      setThemeEngine(
+        res.engine === "emulate" || res.engine === "filter" ? res.engine : "none",
+      )
+      setThemeNoteText(typeof res.note === "string" ? res.note : "")
+    }
   }, [])
 
   const grabPage = useCallback(async () => {
@@ -103,6 +171,22 @@ function IndexPopup() {
     <div style={card}>
       <h1 style={{ margin: 0, fontSize: 15, fontWeight: 600 }}>mdz</h1>
       <p style={subtitle}>Any page to LLM-ready Markdown</p>
+      <div style={themeRow} role="group" aria-label="Page theme">
+        {THEME_OPTIONS.map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            style={themeMode === mode ? themeSegActive : themeSeg}
+            onClick={() => void setTheme(mode)}
+          >
+            {mode === "auto" ? "Auto" : mode === "dark" ? "Dark" : "Light"}
+          </button>
+        ))}
+      </div>
+      {themeEngine === "filter" && themeMode !== "auto" ? (
+        <span style={approxBadge}>Approximate</span>
+      ) : null}
+      {themeNoteText ? <p style={themeNote}>{themeNoteText}</p> : null}
       <div style={row}>
         <kbd style={kbd}>Alt+Shift+C</kbd>
         <span>page</span>

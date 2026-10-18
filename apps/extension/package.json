@@ -18,6 +18,9 @@
       "storage",
       "clipboardWrite"
     ],
+    "optional_permissions": [
+      "debugger"
+    ],
     "commands": {
       "_execute_action": {
         "suggested_key": {
