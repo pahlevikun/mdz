@@ -12,6 +12,13 @@ export { renderMarkdown, renderJson } from "./render";
 export { buildChunks } from "./chunk";
 export { buildOutline } from "./outline";
 export { countTokens, countTokensBoth } from "./tokens";
+export { deriveTokens, toDesignMd, normalizeColor } from "./design-tokens";
+export type {
+  ColorSample,
+  FontSample,
+  SampleSet,
+  TokenDraft,
+} from "./design-tokens";
 export { htmlToMarkdown } from "./extract";
 
 const IMG = /!\[[^\]]*\]\([^)]*\)/g;
