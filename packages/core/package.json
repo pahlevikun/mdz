@@ -7,5 +7,10 @@
   },
   "devDependencies": {
     "gpt-tokenizer": "4.0.4"
+  },
+  "dependencies": {
+    "defuddle": "0.19.5",
+    "linkedom": "0.18.13",
+    "turndown": "7.2.4"
   }
 }
