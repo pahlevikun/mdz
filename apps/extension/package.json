@@ -2,6 +2,42 @@
   "name": "mdz-extension",
   "version": "0.1.0",
   "private": true,
+  "displayName": "mdz",
+  "description": "Any web page to LLM-ready Markdown. Offline, no account, no telemetry.",
+  "author": "Farhan Yuda Pahlevi",
+  "scripts": {
+    "build": "plasmo build",
+    "dev": "plasmo dev",
+    "package": "plasmo package"
+  },
+  "manifest": {
+    "permissions": [
+      "activeTab",
+      "scripting",
+      "contextMenus",
+      "storage",
+      "clipboardWrite"
+    ],
+    "commands": {
+      "_execute_action": {
+        "suggested_key": {
+          "default": "Alt+Shift+M"
+        }
+      },
+      "mdz-copy-page": {
+        "suggested_key": {
+          "default": "Alt+Shift+C"
+        },
+        "description": "Copy the page as Markdown"
+      },
+      "mdz-copy-selection": {
+        "suggested_key": {
+          "default": "Alt+Shift+S"
+        },
+        "description": "Copy the selection as Markdown"
+      }
+    }
+  },
   "dependencies": {
     "plasmo": "0.90.5",
     "react": "18.2.0",
