@@ -1,0 +1,6 @@
+{
+  "name": "mdz-core",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": { ".": "./src/index.ts" }
+}
