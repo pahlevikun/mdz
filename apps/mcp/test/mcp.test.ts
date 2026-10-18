@@ -29,3 +29,40 @@ test("unknown chunk id errors with the valid ids", async () => {
   await expect(handlers.read({ url: "https://example.com/a", chunk: "nope" }, { http, chunk: 300 }))
     .rejects.toThrow(/01-/);
 });
+
+const designHttp = async () => ({
+  html: `<!DOCTYPE html><html><head><title>Design</title><style>
+body{color:#ffffff;background:#16181d}
+a{color:#2f6feb}
+.card{border:1px solid #2f6feb;padding:8px;border-radius:6px}
+p{font-family:Inter;font-size:16px;font-weight:400;line-height:1.5;padding:8px}
+</style></head><body><p>Hi</p></body></html>`,
+  finalUrl: "https://example.com/design",
+});
+
+test("mdz_design_tokens returns design markdown from declared styles", async () => {
+  const r = await handlers.designTokens(
+    { url: "https://example.com/design" },
+    { http: designHttp, chunk: 8000 },
+  );
+  expect(r.startsWith("---")).toBe(true);
+  expect(r).toContain("primary");
+  expect(r).toContain("#2f6feb");
+  expect(r).toMatch(/declared/i);
+});
+
+test("mdz_design_tokens without inline or style blocks warns instead of inventing primary", async () => {
+  const bare = async () => ({
+    html: "<html><head><title>Plain</title></head><body><p>text</p></body></html>",
+    finalUrl: "https://example.com/plain",
+  });
+  const r = await handlers.designTokens(
+    { url: "https://example.com/plain" },
+    { http: bare, chunk: 8000 },
+  );
+  expect(r.startsWith("---")).toBe(true);
+  expect(r).toMatch(/warnings:/i);
+  expect(r).toMatch(/primary/i);
+  expect(r).not.toMatch(/^\s*primary:/m);
+  expect(r).not.toContain('primary: "#');
+});

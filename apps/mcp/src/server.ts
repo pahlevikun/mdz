@@ -6,6 +6,9 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { extractUrl, renderJson } from "mdz-core";
 import { fetchHtml } from "../../../packages/core/src/fetch";
+import { loadDocument } from "../../../packages/core/src/dom";
+import { sampleStyles } from "../../../packages/core/src/design-sample";
+import { deriveTokens, toDesignMd } from "../../../packages/core/src/design-tokens";
 import type { Doc } from "mdz-core";
 
 export interface Deps {
@@ -66,7 +69,31 @@ export const handlers = {
     for (const c of v.chunks) writeFileSync(join(dir, `${c.id}.md`), c.markdown + "\n");
     writeFileSync(join(dir, "index.json"), renderJson(v));
     return `${v.chunks.length} chunks + index.json in ${dir}`;
-  }
+  },
+
+  async designTokens(args: { url: string }, d: Deps): Promise<string> {
+    const got = await d.http(args.url);
+    const dom = loadDocument(got.html, got.finalUrl);
+    const css =
+      [...dom.querySelectorAll("style")].map((s) => s.textContent ?? "").join("\n") +
+      "\n" +
+      [...dom.querySelectorAll("[style]")].map((e) => e.getAttribute("style") ?? "").join("\n");
+    const set = sampleStyles(css);
+    set.pageTitle = dom.querySelector("title")?.textContent ?? "";
+    set.pageUrl = got.finalUrl;
+    const tokens = deriveTokens(set);
+    const md = toDesignMd(tokens, {
+      name: set.pageTitle || "Page",
+      description: `Derived from ${set.pageUrl}`,
+    });
+    return [
+      md,
+      "",
+      "---",
+      `sampled: ${set.colors.length} declared color sample(s), ${set.fonts.length} font group(s), ${set.spacings.length} spacing value(s), ${set.radii.length} radius value(s).`,
+      `warnings: ${tokens.meta.warnings.length ? tokens.meta.warnings.join("; ") : "none"}`,
+    ].join("\n");
+  },
 };
 
 export function buildServer(deps: Deps): McpServer {
@@ -82,6 +109,12 @@ export function buildServer(deps: Deps): McpServer {
   s.tool("mdz_split", "Write one .md per chunk plus index.json.",
     { url, dir: z.string().optional() },
     async (a) => ({ content: [{ type: "text", text: await handlers.split(a, deps) }] }));
+  s.tool(
+    "mdz_design_tokens",
+    "Derive DESIGN.md tokens from a page. Colors are sampled from declared styles in <style> blocks and style attributes, not from rendered pixels; a page styled only by external CSS returns few or no colors.",
+    { url },
+    async (a) => ({ content: [{ type: "text", text: await handlers.designTokens(a, deps) }] }),
+  );
   return s;
 }
 
