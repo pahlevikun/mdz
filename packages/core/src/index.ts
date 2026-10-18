@@ -20,6 +20,10 @@ export type {
   TokenDraft,
 } from "./design-tokens";
 export { htmlToMarkdown } from "./extract";
+export { buildSiteTree, renderSiteTree } from "./site-tree";
+export type { TreePage, TreeEdge, SiteTree, BuildSiteTreeOptions } from "./site-tree";
+export { classifyPage, buildTaxonomy, applyOverrides } from "./taxonomy";
+export type { TaxonomyGuess, Taxonomy } from "./taxonomy";
 
 const IMG = /!\[[^\]]*\]\([^)]*\)/g;
 const LINK = /(?<!!)\[([^\]]*)\]\([^)]*\)/g;
