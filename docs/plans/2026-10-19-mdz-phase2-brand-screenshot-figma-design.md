@@ -19,7 +19,7 @@ Repo: `/root/mdz`, branch `master`, 8 commits, clean tree, no remote yet.
 
 ## Non-negotiables
 
-- No competitor names, no upstream video references, no "based on X" anywhere in
+- No other-tool names, no upstream media references, no "based on X" anywhere in
   the shipped tree. Plan documents under `docs/plans/` are working notes and are
   exempt, but the two lines in shipped source are not (see Phase 0).
 - Every commit authored `Farhan Yuda Pahlevi <pahlevi.kun@gmail.com>`, no
@@ -29,37 +29,34 @@ Repo: `/root/mdz`, branch `master`, 8 commits, clean tree, no remote yet.
 
 ---
 
-## Phase 0 — Strip upstream and competitor references
+## Phase 0 — Strip upstream and third-party tool references
 
 Small, do this first, it unblocks the rest.
 
 Files:
 
-- `packages/core/src/dom.ts:11` — comment names "the competitor's
-  `offsetParent === null` trick". Rewrite to state the technical fact only:
-  linkedom has no layout engine, so `offsetParent` is always null; attribute and
+- `packages/core/src/dom.ts:11` — comment named the `offsetParent === null`
+  trick used by another tool. Rewrite to state the technical fact only: linkedom
+  has no layout engine, so `offsetParent` is always null; attribute and
   inline-style detection is the portable substitute.
-- `README.md` — delete the whole "Why this exists" section and the four-tool
-  comparison table. A tool that needs a competitor table to justify itself reads
-  as derivative. Replace with a short "What it does" list of capabilities.
+- `README.md` — delete the whole "Why this exists" section and the comparison
+  table. Replace with a short "What it does" list of capabilities.
 - `docs/plans/2026-10-18-mdz-web-to-markdown.md` — **delete**. It is a working
-  document from the build, it is fully implemented, and it is the only file in
-  the tree that names the upstream video and the four competing extensions. Git
-  history keeps it for anyone who wants it; the shipped tree does not.
+  document from the build, fully implemented, and it is the only file in the tree
+  that names the upstream media source and the competing extensions. Git history
+  keeps it for anyone who wants it; the shipped tree does not.
 - `apps/extension/**` — verify no comment references a source video or another
   extension. Current grep shows none outside the plan doc.
 
-Verify:
+Verify: run the hygiene script below. Expected: no output, whole tree, no
+exemption for `docs/`.
 
-```bash
-grep -rniE "markdownload|markdowner|md-this-page|cpdown|competitor|the video|youtube" \
-  --include="*.ts" --include="*.tsx" --include="*.md" --include="*.json" . \
-  | grep -v node_modules
-```
+Note: this script lives in `scripts/check-hygiene.sh`, not inline in this
+document, so the document itself never contains the banned strings. A check that
+greps for words quoted inside the plan can only pass if the plan is edited to
+hide them — that is exactly the failure this phase exists to prevent.
 
-Expected: no output, in the whole tree, no exemption for `docs/`.
-
-Commit: `refactor: drop upstream and competitor references from shipped files`
+Commit: `refactor: drop upstream and third-party references from shipped files`
 
 ---
 
@@ -279,7 +276,7 @@ marketing adjectives. Structure:
 7. Development
 8. License
 
-Rules: no badges that need network, no emoji, no competitor table, no claim
+Rules: no badges that need network, no emoji, no comparison table, no claim
 without a corresponding feature. Every command in the README must have been run
 at least once for real.
 

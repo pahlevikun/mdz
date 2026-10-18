@@ -48,15 +48,12 @@ Permissions: `activeTab`, `scripting`, `contextMenus`, `storage`, `clipboardWrit
 
 There are no `host_permissions` and no content script; conversion runs in the extension context on demand.
 
-## Why this exists
+## What it does
 
-| Tool | Binary/CLI | MCP server | Real token counts | Heading-aware chunks | Selection mode | Offline extension |
-|------|------------|------------|-------------------|----------------------|----------------|-------------------|
-| markdownload | — | — | — | — | yes | yes |
-| markdowner | — | — | — | — | — | yes |
-| MD-This-Page | — | — | — | — | — | yes |
-| cpdown | — | — | — | — | — | — |
-| mdz | yes | yes | yes | yes | yes | yes |
+- Heading-aware chunks, one file per section
+- Real token counts for o200k and cl100k
+- YAML frontmatter ready for Obsidian and Logseq
+- The same extraction in the CLI, the MCP server and the browser extension
 
 ## Development
 

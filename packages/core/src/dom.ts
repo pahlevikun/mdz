@@ -8,7 +8,7 @@ export function loadDocument(html: string, url: string): Document {
   return document as unknown as Document;
 }
 
-// linkedom has no `checkVisibility()`; the competitor's `offsetParent === null` trick does not work outside a layout engine. Attribute + inline-style detection is the portable substitute.
+// linkedom has no layout engine, so offsetParent is always null. Attribute and inline-style detection is the portable substitute for checkVisibility().
 function isHidden(el: Element): boolean {
   if (el.hasAttribute("hidden")) return true;
   if (el.getAttribute("aria-hidden") === "true") return true;
