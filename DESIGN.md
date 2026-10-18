@@ -20,6 +20,9 @@ colors:
   danger-bg: "#3d1e1e"
   danger-text: "#f48771"
   success-text: "#3fb950"
+  mark-page: "#2b2f38"
+  mark-flap: "#22262e"
+  mark-edge: "#9aa0a6"
 typography:
   h1:
     fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif"
@@ -117,6 +120,18 @@ components:
     textColor: "{colors.accent}"
     typography: "{typography.body-md}"
     padding: 0
+  brand-mark:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.mark-edge}"
+    rounded: "{rounded.md}"
+  brand-mark-page:
+    backgroundColor: "{colors.mark-page}"
+    textColor: "{colors.accent}"
+    rounded: "{rounded.sm}"
+  brand-mark-flap:
+    backgroundColor: "{colors.mark-flap}"
+    textColor: "{colors.mark-edge}"
+    rounded: "{rounded.sm}"
   divider:
     backgroundColor: "{colors.border-strong}"
     height: 1px

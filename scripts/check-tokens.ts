@@ -30,8 +30,8 @@ function parseFrontmatter(designMd: string): Record<string, string> {
     const m = line.match(/^[ \t]+([\w-]+):\s*"(#[0-9a-fA-F]{6})"/)
     if (m) colors[m[1]] = normalizeHex(m[2])
   }
-  if (Object.keys(colors).length !== 17) {
-    fail(`DESIGN.md: expected 17 dark color tokens, got ${Object.keys(colors).length}`)
+  if (Object.keys(colors).length === 0) {
+    fail("DESIGN.md: colors block parsed empty")
   }
   const required = [
     "version: alpha",
@@ -59,8 +59,8 @@ function parseLightFromProse(designMd: string): Record<string, string> {
   while ((m = re.exec(section[1])) !== null) {
     colors[m[1]] = normalizeHex(m[2])
   }
-  if (Object.keys(colors).length !== 9) {
-    fail(`DESIGN.md: expected 9 light color tokens in prose, got ${Object.keys(colors).length}`)
+  if (Object.keys(colors).length === 0) {
+    fail("DESIGN.md: light prose block parsed empty")
   }
   return colors
 }

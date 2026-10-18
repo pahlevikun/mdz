@@ -25,7 +25,10 @@
     "text-light": "#1a1d21",
     "text-muted-light": "#5f6368",
     "primary-light": "#1a73e8",
-    "danger-text-light": "#c5221f"
+    "danger-text-light": "#c5221f",
+    "mark-page": "#2b2f38",
+    "mark-flap": "#22262e",
+    "mark-edge": "#9aa0a6"
   },
   "fontFamily": {
     "ui": [
@@ -44,23 +47,38 @@
   "fontSize": {
     "h1": [
       "28px",
-      { "lineHeight": "1.2", "fontWeight": "600" }
+      {
+        "lineHeight": "1.2",
+        "fontWeight": "600"
+      }
     ],
     "body-md": [
       "13px",
-      { "lineHeight": "1.55", "fontWeight": "400" }
+      {
+        "lineHeight": "1.55",
+        "fontWeight": "400"
+      }
     ],
     "body-sm": [
       "12px",
-      { "lineHeight": "1.5", "fontWeight": "400" }
+      {
+        "lineHeight": "1.5",
+        "fontWeight": "400"
+      }
     ],
     "label": [
       "11px",
-      { "lineHeight": "1.4", "fontWeight": "500" }
+      {
+        "lineHeight": "1.4",
+        "fontWeight": "500"
+      }
     ],
     "code": [
       "12.5px",
-      { "lineHeight": "1.5", "fontWeight": "400" }
+      {
+        "lineHeight": "1.5",
+        "fontWeight": "400"
+      }
     ]
   },
   "spacing": {
