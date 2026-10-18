@@ -1,5 +1,9 @@
 # mdz — any web page to LLM-ready Markdown
 
+<p align="center">
+  <img src="assets/logo-animated.svg" alt="mdz — any page to LLM-ready markdown" width="100%">
+</p>
+
 One binary. No install. No API key. No page content leaves your machine.
 
 ```bash
