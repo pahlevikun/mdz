@@ -1,20 +1,18 @@
 <!-- static fallback: icon.svg -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="mdz animated icon">
-  <!-- canvas: #0f1115, panel: #14161a, surface: #1e2128, surface-raised: #252830, border: #3a3f47, text-muted: #9aa0a6, primary: #2f6feb -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="mdz icon">
+  <!-- panel: #14161a, page: #2b2f38, flap: #22262e, border: #9aa0a6, accent: #6ba3ff -->
   <g transform="translate(48 48) scale(3.0588235294117645)">
-    <rect x="1" y="1" width="134" height="134" rx="27" fill="#14161a" stroke="#3a3f47" stroke-width="2"/>
-    <path d="M 38 20 H 96 L 112 36 V 100 A 6 6 0 0 1 106 106 H 38 A 6 6 0 0 1 32 100 V 26 A 6 6 0 0 1 38 20 Z" fill="#1e2128" stroke="#3a3f47" stroke-width="2" stroke-linejoin="round"/>
-    <path d="M 96 20 V 32 A 6 6 0 0 0 102 36 H 112 Z" fill="#252830" stroke="#3a3f47" stroke-width="1.5" stroke-linejoin="round"/>
-    <rect x="42" y="46" width="70" height="5" rx="2.5" fill="#9aa0a6"/>
-    <rect x="42" y="56" width="56" height="5" rx="2.5" fill="#9aa0a6"/>
-    <g opacity="1">
-      <rect x="42" y="68" width="4" height="14" rx="1.5" fill="#2f6feb"/>
-      <rect x="54" y="68" width="4" height="14" rx="1.5" fill="#2f6feb"/>
-      <rect x="40" y="72" width="20" height="3" rx="1.5" fill="#2f6feb"/>
-      <rect x="40" y="79" width="20" height="3" rx="1.5" fill="#2f6feb"/>
+    <rect x="0" y="0" width="136" height="136" rx="30" fill="#14161a"/>
+    <path d="M 40 12 H 82 L 104 34 V 116 A 8 8 0 0 1 96 124 H 40 A 8 8 0 0 1 32 116 V 20 A 8 8 0 0 1 40 12 Z"
+          fill="#2b2f38" stroke="#9aa0a6" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M 82 12 V 30 A 4 4 0 0 0 86 34 H 104 Z"
+          fill="#22262e" stroke="#9aa0a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <g stroke="#6ba3ff" stroke-width="8" stroke-linecap="round" opacity="1">
       <animate attributeName="opacity" values="1;0.55;1" dur="4s" repeatCount="indefinite"/>
+      <line x1="58" y1="53" x2="58" y2="95"/>
+      <line x1="78" y1="53" x2="78" y2="95"/>
+      <line x1="49" y1="65" x2="87" y2="65"/>
+      <line x1="49" y1="83" x2="87" y2="83"/>
     </g>
-    <rect x="42" y="90" width="12" height="4" rx="2" fill="#2f6feb"/>
-    <rect x="58" y="88" width="48" height="5" rx="2.5" fill="#9aa0a6"/>
   </g>
 </svg>
