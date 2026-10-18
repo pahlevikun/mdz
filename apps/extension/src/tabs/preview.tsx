@@ -164,6 +164,31 @@ const css = `
   }
   .empty ul { list-style: none; padding: 0; margin: 8px 0 0; font-size: 13px; }
   .empty li { margin: 6px 0; }
+  .shot-panel {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    border-bottom: 1px solid #252830;
+    background: #14161a;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .shot-panel h2 {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .shot-panel button {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #3a3f47;
+    background: #2f6feb;
+    color: #fff;
+    cursor: pointer;
+  }
+  .shot-panel button:hover { filter: brightness(1.08); }
   @media (prefers-color-scheme: light) {
     body { background: #f6f7f9; color: #1a1d21; }
     .bar { background: #fff; border-bottom-color: #e2e4e8; }
@@ -179,6 +204,7 @@ const css = `
     .preview code { background: #eef0f3; }
     .empty h1 { color: #1a1d21; }
     .empty kbd { background: #eef0f3; border-color: #dadce0; color: #1a1d21; }
+    .shot-panel { background: #fff; border-bottom-color: #e2e4e8; }
   }
 `;
 
@@ -189,16 +215,19 @@ function PreviewTab() {
   const [showFrontmatter, setShowFrontmatter] = useState(true);
   const [copied, setCopied] = useState("");
   const [error, setError] = useState("");
+  const [mdzShot, setMdzShot] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
       try {
         const [session, syncRaw] = await Promise.all([
-          chrome.storage.session.get("mdzPayload"),
+          chrome.storage.session.get(["mdzPayload", "mdzShot"]),
           chrome.storage.sync.get(null),
         ]);
         const sync = syncRaw as SyncSettings;
         setShowFrontmatter(sync.frontmatter ?? true);
+        const shot = session.mdzShot as string | undefined;
+        if (shot) setMdzShot(shot);
         const p = session.mdzPayload as Payload | undefined;
         if (!p) {
           setError("");
@@ -286,6 +315,22 @@ function PreviewTab() {
     void flashCopy("frontmatter", fm);
   };
 
+  const onDownloadPng = () => {
+    if (!mdzShot) return;
+    const a = document.createElement("a");
+    a.href = mdzShot;
+    a.download = "screenshot.png";
+    a.click();
+  };
+
+  const shotPanel =
+    mdzShot ? (
+      <div className="shot-panel">
+        <h2>Screenshot</h2>
+        <button type="button" onClick={onDownloadPng}>Download PNG</button>
+      </div>
+    ) : null;
+
   const onDownload = () => {
     const name = slug(doc?.title || "page") + ".md";
     const blob = new Blob([exportMd], { type: "text/markdown;charset=utf-8" });
@@ -310,6 +355,7 @@ function PreviewTab() {
       <>
         <style>{css}</style>
         <div className="root">
+          {shotPanel}
           <div className="empty">
             <h1>mdz</h1>
             {error ? (
@@ -335,6 +381,7 @@ function PreviewTab() {
     <>
       <style>{css}</style>
       <div className="root">
+        {shotPanel}
         <header className="bar">
           <span className="bar-title">{doc.title || "Untitled"}</span>
           <span className="bar-domain">{doc.domain}</span>

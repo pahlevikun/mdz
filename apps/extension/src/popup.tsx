@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 
 const card: React.CSSProperties = {
   width: 260,
@@ -59,7 +59,29 @@ const footer: React.CSSProperties = {
   textAlign: "center",
 }
 
+const errorLine: React.CSSProperties = {
+  marginTop: 8,
+  fontSize: 12,
+  color: "#f28b82",
+  lineHeight: 1.35,
+}
+
 function IndexPopup() {
+  const [screenshotError, setScreenshotError] = useState<string | null>(null)
+
+  const fullPageScreenshot = useCallback(async () => {
+    setScreenshotError(null)
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+    if (tab?.id === undefined) return
+    const res = await chrome.runtime.sendMessage({ type: "mdz:screenshot", tabId: tab.id })
+    if (res?.ok === false) {
+      setScreenshotError(res.error ?? "Screenshot failed")
+      return
+    }
+    await chrome.tabs.create({ url: chrome.runtime.getURL("tabs/preview.html") })
+    window.close()
+  }, [])
+
   const grabPage = useCallback(async () => {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
     if (tab?.id !== undefined) {
@@ -96,6 +118,14 @@ function IndexPopup() {
       <button type="button" style={primaryBtn} onClick={() => void grabPage()}>
         Grab this page
       </button>
+      <button
+        type="button"
+        style={{ ...primaryBtn, marginTop: 8, background: "#1e2128", border: "1px solid #3a3f47" }}
+        onClick={() => void fullPageScreenshot()}
+      >
+        Full page screenshot
+      </button>
+      {screenshotError ? <p style={errorLine} role="alert">{screenshotError}</p> : null}
       <p style={footer}>No account. No telemetry. Nothing leaves this machine.</p>
     </div>
   )
