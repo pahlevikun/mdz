@@ -11,12 +11,17 @@
     },
     "packages/core": {
       "name": "mdz-core",
+      "devDependencies": {
+        "gpt-tokenizer": "4.0.4",
+      },
     },
   },
   "packages": {
     "@types/node": ["@types/node@26.6.5", "", { "dependencies": { "undici-types": "~8.9.0" } }, "sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg=="],
 
     "bun-types": ["bun-types@1.4.3", "", { "dependencies": { "@types/node": "*", "undici-types": "*" } }, "sha512-tinRJNGOmUN+tEAsn2y2e942n9JHRHR42iUYzDH75NmhJqVBokGSQkkfSFdNWwsANIdrK6ACH9t01M452YyTwg=="],
+
+    "gpt-tokenizer": ["gpt-tokenizer@4.0.4", "", {}, "sha512-CbVfnTqAqjMOF4AhdKUcqBLfSQ2Inb3HWoqc5E6I/sj+VMg3r+PN/s5waZ2nc4/DJ/TaFUzeqV6e9Q6+GsIn2Q=="],
 
     "mdz-core": ["mdz-core@workspace:packages/core"],
 
