@@ -62,24 +62,29 @@ function meta(doc: Document, url: string, d: any): ExtractMeta {
   };
 }
 
-export function extractContent(doc: Document, url: string) {
+export function extractContent(doc: Document, url: string, selector?: string) {
+  const source = selector ? doc.querySelector(selector) : null;
+  const src = (source ?? doc) as Document;
+
   const warnings: string[] = [];
   let parsed: any = null;
   try {
-    parsed = new Defuddle(doc, { url, markdown: false, useAsync: false }).parse();
+    parsed = new Defuddle(src, { url, markdown: false, useAsync: false }).parse();
   } catch (e) {
     warnings.push(`defuddle failed: ${(e as Error).message}`);
   }
 
   const mainHtml = (parsed?.content ?? "").trim();
   let markdown = mainHtml ? htmlToMarkdown(mainHtml) : "";
-  const pageText = (doc.body?.textContent ?? "").replace(/\s+/g, " ");
+  const pageText = (
+    src.body?.textContent ?? source?.textContent ?? ""
+  ).replace(/\s+/g, " ");
   const extracted = wordCount(markdown);
   const page = wordCount(pageText);
 
   let extractor: "defuddle" | "fallback" = "defuddle";
   if (!markdown || (extracted < MIN_WORDS && page > extracted * FALLBACK_RATIO)) {
-    const root = doc.body;
+    const root = source ?? src.body;
     let fallbackHtml = "";
     if (root) {
       const clone = visibleClone(root as Element);
