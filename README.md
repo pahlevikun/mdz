@@ -63,6 +63,17 @@ Tools:
 }
 ```
 
+### Teaching the agent to use it
+
+Tools alone do not make an agent read a page in the right order. The companion
+skill does that: `skills/mdz-read/SKILL.md` tells the agent to call
+`mdz_outline` first, pick the chunks the question needs, and read only those —
+plus what to do when a page is blocked or JS-only.
+
+```bash
+npx skills add pahlevikun/mdz/skills/mdz-read
+```
+
 `mdz_design_tokens` reads `<style>` blocks and `style` attributes, not rendered pixels. A page styled only by external CSS returns few colors. That is a real limit, and the tool says so in its output.
 
 ## Browser extension
