@@ -9,6 +9,12 @@
         "typescript": "^5.7.3",
       },
     },
+    "apps/cli": {
+      "name": "mdz-cli",
+      "dependencies": {
+        "mdz-core": "workspace:*",
+      },
+    },
     "packages/core": {
       "name": "mdz-core",
       "dependencies": {
@@ -65,6 +71,8 @@
     "linkedom": ["linkedom@0.18.13", "", { "dependencies": { "css-select": "^7.0.0", "cssom": "^0.5.0", "html-escaper": "^3.0.3", "htmlparser2": "^10.1.0", "uhyphen": "^0.2.0" }, "peerDependencies": { "canvas": ">= 2" }, "optionalPeers": ["canvas"] }, "sha512-ES/o9qotMpzpN2MHs+Iq/JcVoOj8Fa5wiQYrTdFpvAnwXL0g66XHHUc9WUMk6nAlBtGsFQ24ne+SYnvnaQ2FSw=="],
 
     "mathml-to-latex": ["mathml-to-latex@1.8.0", "", { "dependencies": { "@xmldom/xmldom": "^0.9.10" } }, "sha512-gQ0uK3zqB8HwlfaXJkEL5rgaZNbKUiBMmBP/B/W+b+t6KcseLSuYb1b0BjLgS9ZiQa24ePkqTX8/6FaQuDL7wQ=="],
+
+    "mdz-cli": ["mdz-cli@workspace:apps/cli"],
 
     "mdz-core": ["mdz-core@workspace:packages/core"],
 
