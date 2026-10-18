@@ -13,6 +13,7 @@ export { buildChunks } from "./chunk";
 export { buildOutline } from "./outline";
 export { countTokens, countTokensBoth } from "./tokens";
 export { deriveTokens, toDesignMd, normalizeColor } from "./design-tokens";
+export { sampleStyles } from "./design-sample";
 export type {
   ColorSample,
   FontSample,

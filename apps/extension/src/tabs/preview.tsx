@@ -16,6 +16,7 @@ import {
   type TechCategory,
 } from "../../../../packages/core/src/tech-stack";
 import { gatherPageSignals } from "../stack-signals";
+import { collectStyleText, designFilesFromStyles } from "../design-sample";
 
 interface Payload {
   html: string;
@@ -407,6 +408,9 @@ function PreviewTab() {
   const [figmaPreparing, setFigmaPreparing] = useState(false);
   const [figmaNote, setFigmaNote] = useState("");
   const [figmaError, setFigmaError] = useState("");
+  const [designTokensNote, setDesignTokensNote] = useState("");
+  const [designTokensError, setDesignTokensError] = useState("");
+  const [designTokensBusy, setDesignTokensBusy] = useState(false);
   const [payload, setPayload] = useState<Payload | null>(null);
 
   useEffect(() => {
@@ -548,6 +552,42 @@ function PreviewTab() {
     }
   };
 
+  const downloadTextFile = (filename: string, content: string, mime: string) => {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const onDesignTokens = async () => {
+    if (!payload || designTokensBusy) return;
+    const width = payload.viewportWidth ?? 1280;
+    setDesignTokensBusy(true);
+    setDesignTokensError("");
+    setDesignTokensNote("");
+    try {
+      await withLayoutFrame(payload.html, payload.url, { width }, (root) => {
+        const css = collectStyleText(root);
+        const { designMd, tokensJson } = designFilesFromStyles(
+          css,
+          doc?.title || "Page",
+          finalUrl || payload.url,
+        );
+        downloadTextFile("DESIGN.md", designMd, "text/markdown;charset=utf-8");
+        downloadTextFile("tokens.json", tokensJson, "application/json;charset=utf-8");
+        return "";
+      });
+      setDesignTokensNote("Saved DESIGN.md and tokens.json.");
+    } catch (e) {
+      setDesignTokensError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setDesignTokensBusy(false);
+    }
+  };
+
   const onCopyFrontmatter = () => {
     if (!doc) return;
     const fm = toFrontmatter({
@@ -684,6 +724,13 @@ function PreviewTab() {
           {btn("frontmatter", "Copy frontmatter", onCopyFrontmatter)}
           <button
             type="button"
+            disabled={designTokensBusy}
+            onClick={() => void onDesignTokens()}
+          >
+            {designTokensBusy ? "Preparing…" : "Design tokens"}
+          </button>
+          <button
+            type="button"
             disabled={figmaPreparing}
             onClick={() => void onCopyFigma()}
           >
@@ -696,6 +743,8 @@ function PreviewTab() {
         </header>
         {figmaNote ? <div className="figma-note">{figmaNote}</div> : null}
         {figmaError ? <div className="figma-err">{figmaError}</div> : null}
+        {designTokensNote ? <div className="figma-note">{designTokensNote}</div> : null}
+        {designTokensError ? <div className="figma-err">{designTokensError}</div> : null}
         {banner ? (
           <div className="banner">
             This page may need JavaScript to render fully, or extraction found
