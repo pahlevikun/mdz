@@ -3,7 +3,7 @@
 Status: draft for review. No code in this document. Every phase below ends in a
 real build or a real test run, and one atomic commit.
 
-Repo: `/root/mdz`, branch `master`, 8 commits, clean tree, no remote yet.
+Repo: `/root/mdz`, branch `main`, 8 commits, clean tree, no remote yet.
 
 ---
 
