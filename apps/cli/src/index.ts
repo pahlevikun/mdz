@@ -84,7 +84,7 @@ export async function run(argv: string[], deps: Deps): Promise<number> {
   return 0;
 }
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 const HELP = `mdz — any web page to LLM-ready Markdown
 

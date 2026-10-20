@@ -97,7 +97,7 @@ export const handlers = {
 };
 
 export function buildServer(deps: Deps): McpServer {
-  const s = new McpServer({ name: "mdz", version: "0.1.0" });
+  const s = new McpServer({ name: "mdz", version: "0.1.1" });
   const url = z.string().url();
   s.tool("mdz_outline", "List a page's sections and chunk ids before reading it.",
     { url }, async (a) => ({ content: [{ type: "text", text: await handlers.outline(a, deps) }] }));
