@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 904 256" width="904" height="256" fill="none" role="img" aria-label="mdz — any page to LLM-ready markdown">
-  <!-- canvas: #0f1115, panel: #14161a, page: #2b2f38, flap: #22262e, border: #9aa0a6, accent: #6ba3ff -->
+  <!-- canvas: #0f1115, panel: #14161a, page: #2b2f38, border: #9aa0a6, accent: #6ba3ff -->
   <!-- text: #e6e8eb, text-body: #d7dbe0, text-muted: #9aa0a6, divider: #252a33, pill: #252830 -->
   <!--
     Vertical rhythm, banner 0..256, everything centred on y=128:
@@ -17,10 +17,8 @@
   <!-- mark: geometry copied from assets/icon.svg, tile 136px -->
   <g transform="translate(24 60)">
     <rect x="0" y="0" width="136" height="136" rx="30" fill="#14161a"/>
-    <path d="M 40 12 H 82 L 104 34 V 116 A 8 8 0 0 1 96 124 H 40 A 8 8 0 0 1 32 116 V 20 A 8 8 0 0 1 40 12 Z"
+    <path d="M 40 12 H 96 A 8 8 0 0 1 104 20 V 116 A 8 8 0 0 1 96 124 H 40 A 8 8 0 0 1 32 116 V 20 A 8 8 0 0 1 40 12 Z"
           fill="#2b2f38" stroke="#9aa0a6" stroke-width="3.5" stroke-linejoin="round"/>
-    <path d="M 82 12 V 30 A 4 4 0 0 0 86 34 H 104 Z"
-          fill="#22262e" stroke="#9aa0a6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     <g stroke="#6ba3ff" stroke-width="8" stroke-linecap="round">
       <line x1="58" y1="53" x2="58" y2="95"/>
       <line x1="78" y1="53" x2="78" y2="95"/>
