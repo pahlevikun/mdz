@@ -2,6 +2,7 @@ export interface SnapshotOptions {
   maxNodes?: number;
   maxBytes?: number;
   maxSvgBytes?: number;
+  maxImageBytes?: number;
 }
 
 export interface SnapshotResult {
@@ -206,6 +207,10 @@ export function snapshotForFigma(
   const maxNodes = opts?.maxNodes ?? 5000;
   const maxBytes = opts?.maxBytes ?? 2 * 1024 * 1024;
   const maxSvgBytes = opts?.maxSvgBytes ?? 400 * 1024;
+  // One photo can be most of the budget. Keep the layout box, drop the pixels.
+  const maxImageBytes = opts?.maxImageBytes ?? 120 * 1024;
+
+  let omittedImages = 0;
 
   const measure = hooks?.measure ?? defaultMeasure;
   const styleOf = hooks?.styleOf ?? defaultStyleOf;
@@ -222,10 +227,12 @@ export function snapshotForFigma(
 
   const hitBudget = (which: "nodes" | "bytes") => {
     truncated = true;
+    const dropped =
+      omittedImages > 0 ? `, ${omittedImages} large images left as links` : "";
     reason =
       which === "nodes"
-        ? "node limit reached"
-        : "size limit reached";
+        ? `node limit reached${dropped}`
+        : `size limit reached${dropped}`;
   };
 
   const tryEmit = (html: string): boolean => {
@@ -267,7 +274,11 @@ export function snapshotForFigma(
       const raw = el.getAttribute("src") ?? "";
       let src = resolveUrl(raw, baseUrl);
       const data = toDataUrl(src);
-      if (data) src = data;
+      if (data && data.length <= maxImageBytes) {
+        src = data;
+      } else if (data) {
+        omittedImages += 1;
+      }
       return `<img src="${escapeAttr(src)}" alt="" style="width:100%;height:100%;display:block" />`;
     }
     if (tag === "svg") {
