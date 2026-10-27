@@ -20,6 +20,39 @@ interface MeasureResult {
   dpr: number;
 }
 
+// Chrome allows two captureVisibleTab calls per second per extension. A tall page
+// needs many frames, so every call is spaced out and retried with backoff.
+const CAPTURE_GAP_MS = 600;
+const CAPTURE_ATTEMPTS = 6;
+let lastCaptureAt = 0;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isQuotaError(e: unknown): boolean {
+  const msg = e instanceof Error ? e.message : String(e);
+  return /MAX_CAPTURE_VISIBLE_TAB_CALLS_PER_SECOND|quota/i.test(msg);
+}
+
+async function capturePaced(windowId: number): Promise<string> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < CAPTURE_ATTEMPTS; attempt++) {
+    const gap = CAPTURE_GAP_MS - (Date.now() - lastCaptureAt);
+    if (gap > 0) await sleep(gap);
+    lastCaptureAt = Date.now();
+    try {
+      return await chrome.tabs.captureVisibleTab(windowId, { format: "png" });
+    } catch (e) {
+      lastError = e;
+      if (!isQuotaError(e)) throw e;
+      await sleep(400 * (attempt + 1));
+    }
+  }
+  const detail = lastError instanceof Error ? lastError.message : String(lastError);
+  throw new Error(`Capture quota refused ${CAPTURE_ATTEMPTS} times: ${detail}`);
+}
+
 async function injectRestore(tabId: number): Promise<void> {
   await chrome.scripting.executeScript({
     target: { tabId },
@@ -94,7 +127,7 @@ export async function runScreenshot(tabId: number): Promise<void> {
           }),
         args: [cssTop],
       });
-      const dataUrl = await chrome.tabs.captureVisibleTab(windowId, { format: "png" });
+      const dataUrl = await capturePaced(windowId);
       captured.push({ dataUrl, cssTop });
     }
 
