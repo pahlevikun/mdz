@@ -1,6 +1,6 @@
 {
   "name": "mdz-extension",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "displayName": "mdz",
   "description": "Any web page to LLM-ready Markdown. Offline, no account, no telemetry.",
